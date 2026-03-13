@@ -1,5 +1,12 @@
+# dependencies
 node_modules/
+
+# environment variables
 .env
+.env.local
+.env.development
+.env.test
+.env.production
 
 # logs
 logs
@@ -7,6 +14,7 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # runtime data
 pids
@@ -16,18 +24,27 @@ pids
 
 # coverage
 coverage/
+.nyc_output
 
 # build
 dist/
 build/
 
-# Prisma
-prisma/migrations/
+# cache
+.cache/
+.tmp/
 
-# sistema operacional
+# OS files
 .DS_Store
 Thumbs.db
 
-# editor
+# editors
 .vscode/
 .idea/
+*.swp
+
+# optional npm cache
+.npm
+
+# dotenv backup
+.env.backup
