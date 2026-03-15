@@ -7,12 +7,14 @@ exports.register = async (req, res) => {
         const { name, email, password, phone, role } = req.body;
         if (role === "ADMIN") {
             return res.status(403).json({
+                success: false,
                 message: "Não é permitido criar administrador"
             });
         }
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
             return res.status(400).json({
+                success: false,
                 message: "Email já cadastrado"
             });
         }
@@ -36,17 +38,21 @@ exports.register = async (req, res) => {
         }
         const token = generateToken(user);
         res.status(201).json({
+            success: true,
             message: "Usuário criado com sucesso",
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role
+            data: {
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
             },
-            token
+            token: token
         });
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: "Erro ao criar usuário",
             error: error.message
         });
@@ -59,28 +65,34 @@ exports.login = async (req, res) => {
         const user = await User.findOne({ where: { email } });
         if (!user) {
             return res.status(404).json({
+                success: false,
                 message: "Usuário não encontrado"
             });
         }
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
             return res.status(401).json({
+                success: false,
                 message: "Senha inválida"
             });
         }
         const token = generateToken(user);
-        res.json({
+        res.status(200).json({
+            success: true,
             message: "Login realizado com sucesso",
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role
+            data: {
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
             },
-            token
+            token: token
         });
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: "Erro no login",
             error: error.message
         });
