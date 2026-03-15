@@ -1,23 +1,34 @@
-/*
-Endpoints:
-POST   /services
-GET    /services
-GET    /services/:id
-PUT    /services/:id
-DELETE /services/:id
-GET    /services/category/:categoryId
+const express = require("express");
+const router = express.Router();
 
-Regras:
-Endpoint	Permissão
-GET services	público
-GET service	público
-GET by category	público
-POST	PROVIDER
-PUT	PROVIDER dono
-DELETE	PROVIDER dono
+const serviceController = require("../controllers/serviceController");
 
-No update/delete precisamos verificar:
-service.providerId === providerProfile.id
-Se não:
-403 Forbidden
-*/
+const authMiddleware = require("../middlewares/authMiddleware");
+const providerMiddleware = require("../middlewares/providerMiddleware");
+
+router.get("/", serviceController.getAllServices);
+
+router.get("/:id", serviceController.getServiceById);
+
+router.post(
+    "/",
+    authMiddleware,
+    providerMiddleware,
+    serviceController.createService
+);
+
+router.put(
+    "/:id",
+    authMiddleware,
+    providerMiddleware,
+    serviceController.updateService
+);
+
+router.delete(
+    "/:id",
+    authMiddleware,
+    providerMiddleware,
+    serviceController.deleteService
+);
+
+module.exports = router;

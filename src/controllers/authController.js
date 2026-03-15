@@ -1,22 +1,17 @@
 const bcrypt = require("bcrypt");
 const { User, ClientProfile, ProviderProfile } = require("../models");
 const generateToken = require("../utils/generateToken");
+const { sendSuccess, sendError } = require("../utils/apiResponse");
 
 exports.register = async (req, res) => {
     try {
         const { name, email, password, phone, role } = req.body;
         if (role === "ADMIN") {
-            return res.status(403).json({
-                success: false,
-                message: "Não é permitido criar administrador"
-            });
+            return sendError(response, 403, "Não é permitido criar administrador");
         }
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                message: "Email já cadastrado"
-            });
+            return sendError(res, 400, "Email já cadastrado");
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
@@ -51,11 +46,7 @@ exports.register = async (req, res) => {
             token: token
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Erro ao criar usuário",
-            error: error.message
-        });
+        return sendError(res, 500, "Erro ao criar usuário");
     }
 };
 
@@ -64,17 +55,11 @@ exports.login = async (req, res) => {
         const { email, password } = req.body;
         const user = await User.findOne({ where: { email } });
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Usuário não encontrado"
-            });
+            return sendError(res, 404, "Usuário não encontrado");
         }
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            return res.status(401).json({
-                success: false,
-                message: "Senha inválida"
-            });
+            return sendError(res, 401, "Senha inválida");
         }
         const token = generateToken(user);
         res.status(200).json({
@@ -91,10 +76,6 @@ exports.login = async (req, res) => {
             token: token
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Erro no login",
-            error: error.message
-        });
+        return sendError(res, 500, "Erro no login");
     }
 };

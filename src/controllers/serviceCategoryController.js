@@ -1,26 +1,16 @@
 const { ServiceCategory } = require("../models");
+const { sendSuccess, sendError } = require("../utils/apiResponse");
 
 exports.createCategory = async (req, res) => {
     try {
         const { name } = req.body;
         const category = await ServiceCategory.create({ name });
-        return res.status(201).json({
-            success: true,
-            message: "Recurso criado com sucesso",
-            data: category
-        });
+        return sendSuccess(res, 201, "Recurso criado com sucesso", category);
     } catch (error) {
         if (error.name === "SequelizeUniqueConstraintError") {
-            return res.status(400).json({
-                success: false,
-                message: "Categoria já existe"
-            });
+            return sendError(res, 400, "Categoria já existe");
         }
-        return res.status(500).json({
-            success: false,
-            message: "Erro ao criar categoria",
-            error: error.message
-        });
+        return sendError(res, 500, "Erro ao criar categoria");
     }
 };
 
@@ -29,16 +19,9 @@ exports.getAllCategories = async (req, res) => {
         const categories = await ServiceCategory.findAll({
             order: [["name", "ASC"]]
         });
-        return res.status(200).json({
-            success: true,
-            data: categories
-        });
+        return sendSuccess(res, 200, "Categorias retornadas", categories);
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Erro ao buscar categorias",
-            error: error.message
-        });
+        return sendError(res, 500, "Erro ao buscar categorias");
     }
 };
 
@@ -47,21 +30,11 @@ exports.getCategoryById = async (req, res) => {
         const { id } = req.params;
         const category = await ServiceCategory.findByPk(id);
         if (!category) {
-            return res.status(404).json({
-                success: false,
-                message: "Categoria não encontrada"
-            });
+            return sendError(res, 404, "Categoria não encontrada");
         }
-        return res.status(200).json({
-            success: true,
-            data: category
-        });
+        return sendSuccess(res, 200, "Categoria retornada", category);
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Erro ao buscar categoria",
-            error: error.message
-        });
+        return sendError(res, 500, "Erro ao buscar categoria");
     }
 };
 
@@ -71,24 +44,13 @@ exports.updateCategory = async (req, res) => {
         const { name } = req.body;
         const category = await ServiceCategory.findByPk(id);
         if (!category) {
-            return res.status(404).json({
-                success: false,
-                message: "Categoria não encontrada"
-            });
+            return sendError(res, 404, "Categoria não encontrada");
         }
         category.name = name;
         await category.save();
-        return res.status(200).json({
-            success: true,
-            message: "Categoria atualizada com sucesso",
-            data: category
-        });
+        return sendSuccess(res, 200, "Categoria atualizada com sucesso", category);
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Erro ao atualizar categoria",
-            error: error.message
-        });
+        return sendError(res, 500, "Erro ao atualizar categoria");
     }
 };
 
@@ -97,21 +59,11 @@ exports.deleteCategory = async (req, res) => {
         const { id } = req.params;
         const category = await ServiceCategory.findByPk(id);
         if (!category) {
-            return res.status(404).json({
-                success: false,
-                message: "Categoria não encontrada"
-            });
+            return sendError(res, 404, "Categoria não encontrada");
         }
         await category.destroy();
-        return res.status(200).json({
-            success: true,
-            message: "Recurso removido com sucesso"
-        });
+        return sendSuccess(res, 200, "Recurso removido com sucesso");
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Erro ao remover categoria",
-            error: error.message
-        });
+        return sendError(res, 500, "Erro ao remover categoria");
     }
 };
