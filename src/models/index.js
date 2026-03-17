@@ -34,6 +34,10 @@ Service.hasMany(ServiceRequest, { foreignKey: "serviceId", as: "requests" });
 ServiceRequest.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
 
 
+ServiceCategory.hasMany(ServiceRequest, { foreignKey: "categoryId", as: "requests" });
+ServiceRequest.belongsTo(ServiceCategory, { foreignKey: "categoryId", as: "category" });
+
+
 ServiceRequest.hasMany(RequestRecipient, { foreignKey: "requestId", as: "recipients" });
 RequestRecipient.belongsTo(ServiceRequest, { foreignKey: "requestId", as: "request" });
 

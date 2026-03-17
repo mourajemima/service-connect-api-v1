@@ -1,5 +1,6 @@
 const { ServiceCategory } = require("../models");
 const { sendSuccess, sendError } = require("../utils/apiResponse");
+const { getPagination, getPagingData } = require("../utils/pagination");
 
 exports.createCategory = async (req, res) => {
     try {
@@ -16,10 +17,14 @@ exports.createCategory = async (req, res) => {
 
 exports.getAllCategories = async (req, res) => {
     try {
-        const categories = await ServiceCategory.findAll({
+        const { page, limit, offset } = getPagination(req.query.page, req.query.limit);
+        const data = await ServiceCategory.findAndCountAll({
+            limit,
+            offset,
             order: [["name", "ASC"]]
         });
-        return sendSuccess(res, 200, "Categorias retornadas", categories);
+        const response = getPagingData(data, page, limit);
+        return sendSuccess(res, 200, "Categorias retornadas", response);
     } catch (error) {
         return sendError(res, 500, "Erro ao buscar categorias");
     }

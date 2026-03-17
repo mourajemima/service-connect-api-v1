@@ -1,5 +1,6 @@
 const { Service, ServiceCategory, ProviderProfile } = require("../models");
 const { sendSuccess, sendError } = require("../utils/apiResponse");
+const { getPagination, getPagingData } = require("../utils/pagination");
 
 exports.createService = async (req, res) => {
     try {
@@ -34,8 +35,11 @@ exports.getAllServices = async (req, res) => {
         if (categoryId) {
             where.categoryId = categoryId;
         }
-        const services = await Service.findAll({
+        const { page, limit, offset } = getPagination(req.query.page, req.query.limit);
+        const data = await Service.findAndCountAll({
             where,
+            limit,
+            offset,
             include: [
                 {
                     model: ServiceCategory,
@@ -50,7 +54,8 @@ exports.getAllServices = async (req, res) => {
             ],
             order: [["title", "ASC"]]
         });
-        return sendSuccess(res, 200, "Serviços encontrados", services);
+        const response = getPagingData(data, page, limit);
+        return sendSuccess(res, 200, "Serviços encontrados", response);
     } catch (error) {
         return sendError(res, 500, "Erro ao buscar serviços");
     }
