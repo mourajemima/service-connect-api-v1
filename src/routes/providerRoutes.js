@@ -13,18 +13,12 @@ router.get(
     providerController.getMyRequests
 );
 
-router.post(
-    "/:requestId/accept",
-    authMiddleware,
-    providerMiddleware,
-    providerController.acceptRequest
+router.get(
+    "/history", 
+    authMiddleware, 
+    providerMiddleware, 
+    providerController.getHistory
 );
 
-router.post(
-    "/:requestId/reject",
-    authMiddleware,
-    providerMiddleware,
-    providerController.rejectRequest
-);
 
 module.exports = router;

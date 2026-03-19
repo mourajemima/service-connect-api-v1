@@ -45,11 +45,6 @@ const ServiceRequest = sequelize.define("ServiceRequest", {
         defaultValue: "OPEN"
     },
 
-    scheduledAt: {
-        type: DataTypes.DATE,
-        allowNull: true
-    }
-
 }, {
     timestamps: true
 });
