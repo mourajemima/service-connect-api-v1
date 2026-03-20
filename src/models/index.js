@@ -46,6 +46,12 @@ ServiceExecution.belongsTo(ProviderProfile, { foreignKey: "providerId", as: "pro
 ServiceExecution.hasOne(Review, { foreignKey: "executionId", as: "review" });
 Review.belongsTo(ServiceExecution, { foreignKey: "executionId", as: "execution" });
 
+ClientProfile.hasMany(Review, { foreignKey: "clientId", as: "reviews" });
+Review.belongsTo(ClientProfile, { foreignKey: "clientId", as: "client" });
+
+ProviderProfile.hasMany(Review, { foreignKey: "providerId", as: "reviews" });
+Review.belongsTo(ProviderProfile, { foreignKey: "providerId", as: "provider" });
+
 module.exports = {
     sequelize,
     User,

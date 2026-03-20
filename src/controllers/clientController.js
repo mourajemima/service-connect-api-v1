@@ -52,3 +52,20 @@ exports.getHistory = async (req, res) => {
         return sendError(res, 500, "Erro ao buscar histórico", error.message);
     }
 };
+
+exports.getProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findByPk(userId, {
+            attributes: ["id", "name", "email", "phone"]
+        });
+        return sendSuccess(
+            res,
+            200,
+            "Perfil do cliente",
+            user
+        );
+    } catch (error) {
+        return sendError(res, 500, "Erro ao buscar perfil", error.message);
+    }
+};

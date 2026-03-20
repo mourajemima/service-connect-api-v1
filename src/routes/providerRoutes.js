@@ -20,5 +20,24 @@ router.get(
     providerController.getHistory
 );
 
+router.get(
+    "/profile", 
+    authMiddleware, 
+    providerMiddleware, 
+    providerController.getProfile
+);
+
+router.patch(
+    "/profile", 
+    authMiddleware, 
+    providerMiddleware, 
+    providerController.updateProfile
+);
+
+router.get(
+    "/:providerId/reviews", 
+    providerController.getProviderReviews
+);
+
 
 module.exports = router;

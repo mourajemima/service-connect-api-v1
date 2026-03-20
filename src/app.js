@@ -11,6 +11,7 @@ const providerRoutes = require("./routes/providerRoutes");
 const serviceExecutionRoutes = require("./routes/serviceExecutionRoutes");
 const clientRoutes = require("./routes/clientRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 app.use(cors());
 app.use(express.json());
@@ -24,5 +25,6 @@ app.use("/provider", providerRoutes);
 app.use("/executions", serviceExecutionRoutes);
 app.use("/client", clientRoutes);
 app.use("/reviews", reviewRoutes);
+app.use("/admin", adminRoutes);
 
 module.exports = app;
