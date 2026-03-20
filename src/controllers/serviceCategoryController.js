@@ -23,8 +23,9 @@ exports.getAllCategories = async (req, res) => {
             offset,
             order: [["name", "ASC"]]
         });
-        const response = getPagingData(data, page, limit);
-        return sendSuccess(res, 200, "Categorias retornadas", response);
+        const { rows } = data;
+        const meta = getPagingData(data, page, limit);
+        return sendSuccess(res, 200, "Categorias retornadas", rows, { meta });
     } catch (error) {
         return sendError(res, 500, "Erro ao buscar categorias");
     }
@@ -67,7 +68,7 @@ exports.deleteCategory = async (req, res) => {
             return sendError(res, 404, "Categoria não encontrada");
         }
         await category.destroy();
-        return sendSuccess(res, 200, "Recurso removido com sucesso");
+        return sendSuccess(res, 200, "Categoria removido com sucesso");
     } catch (error) {
         return sendError(res, 500, "Erro ao remover categoria");
     }

@@ -5,12 +5,7 @@ const { getPagination, getPagingData } = require("../utils/pagination");
 exports.createService = async (req, res) => {
     try {
         const { title, description, price, categoryId } = req.body;
-        const providerProfile = await ProviderProfile.findOne({
-            where: { userId: req.user.id }
-        });
-        if (!providerProfile) {
-            return sendError(res, 403, "Apenas prestadores podem criar serviços");
-        }
+        const providerId = req.providerId;
         const category = await ServiceCategory.findByPk(categoryId);
         if (!category) {
             return sendError(res, 404, "Categoria não encontrada");
@@ -20,7 +15,7 @@ exports.createService = async (req, res) => {
             description,
             price,
             categoryId,
-            providerId: providerProfile.id
+            providerId
         });
         return sendSuccess(res, 201, "Serviço criado com sucesso", service);
     } catch (error) {
@@ -54,8 +49,9 @@ exports.getAllServices = async (req, res) => {
             ],
             order: [["title", "ASC"]]
         });
-        const response = getPagingData(data, page, limit);
-        return sendSuccess(res, 200, "Serviços encontrados", response);
+        const { rows } = data;
+        const meta = getPagingData(data, page, limit);
+        return sendSuccess(res, 200, "Serviços encontrados", rows, { meta });
     } catch (error) {
         return sendError(res, 500, "Erro ao buscar serviços");
     }
@@ -95,10 +91,8 @@ exports.updateService = async (req, res) => {
         if (!service) {
             return sendError(res, 404, "Serviço não encontrado");
         }
-        const providerProfile = await ProviderProfile.findOne({
-            where: { userId: req.user.id }
-        });
-        if (!providerProfile || service.providerId !== providerProfile.id) {
+        const providerId = req.providerId;
+        if (service.providerId !== providerId) {
             return sendError(res, 403, "Você não tem permissão para editar este serviço");
         }
         service.title = title ?? service.title;
@@ -119,10 +113,8 @@ exports.deleteService = async (req, res) => {
         if (!service) {
             return sendError(res, 404, "Serviço não encontrado");
         }
-        const providerProfile = await ProviderProfile.findOne({
-            where: { userId: req.user.id }
-        });
-        if (!providerProfile || service.providerId !== providerProfile.id) {
+        const providerId = req.providerId;
+        if (service.providerId !== providerId) {
             return sendError(res, 403, "Você não tem permissão para remover este serviço");
         }
         await service.destroy();

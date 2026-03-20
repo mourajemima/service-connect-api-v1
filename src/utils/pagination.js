@@ -12,14 +12,12 @@ function getPagination(page, limit) {
 }
 
 function getPagingData(data, page, limit) {
-    const { count, rows } = data;
-    const totalPages = Math.ceil(count / limit);
+    const { count } = data;
     return {
         total: count,
         page,
         limit,
-        totalPages,
-        items: rows
+        totalPages: Math.ceil(count / limit),
     };
 }
 

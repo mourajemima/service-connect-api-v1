@@ -1,5 +1,4 @@
 const {
-    ProviderProfile,
     ServiceExecution,
     ServiceRequest,
     sequelize
@@ -9,14 +8,7 @@ const { sendSuccess, sendError } = require("../utils/apiResponse");
 exports.scheduleExecution = async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-        const userId = req.user.id;
-        const providerProfile = await ProviderProfile.findOne({
-            where: { userId }
-        });
-        if (!providerProfile) {
-            return sendError(res, 404, "Perfil de prestador não encontrado");
-        }
-        const providerId = providerProfile.id;
+        const providerId = req.providerId;
         const { executionId } = req.params;
         const { scheduledAt } = req.body;
         if (!scheduledAt) {
@@ -59,14 +51,7 @@ exports.scheduleExecution = async (req, res) => {
 exports.finishExecution = async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-        const userId = req.user.id;
-        const providerProfile = await ProviderProfile.findOne({
-            where: { userId }
-        });
-        if (!providerProfile) {
-            return sendError(res, 404, "Perfil de prestador não encontrado");
-        }
-        const providerId = providerProfile.id;
+        const providerId = req.providerId;
         const { executionId } = req.params;
         const execution = await ServiceExecution.findByPk(executionId, {
             transaction,
@@ -103,14 +88,7 @@ exports.finishExecution = async (req, res) => {
 exports.cancelExecution = async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-        const userId = req.user.id;
-        const providerProfile = await ProviderProfile.findOne({
-            where: { userId }
-        });
-        if (!providerProfile) {
-            return sendError(res, 404, "Perfil de prestador não encontrado");
-        }
-        const providerId = providerProfile.id;
+        const providerId = req.providerId;
         const { executionId } = req.params;
         const execution = await ServiceExecution.findByPk(executionId, {
             transaction,

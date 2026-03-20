@@ -4,7 +4,6 @@ const {
     ServiceCategory,
     ProviderProfile,
     ServiceExecution,
-    ClientProfile,
     User
 } = require("../models");
 const { sendSuccess, sendError } = require("../utils/apiResponse");
@@ -12,24 +11,20 @@ const { getPagination, getPagingData } = require("../utils/pagination");
 
 exports.getHistory = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const clientProfile = await ClientProfile.findOne({
-            where: { userId }
-        });
-        if (!clientProfile) {
-            return sendError(res, 404, "Perfil de cliente não encontrado");
-        }
-        const clientId = clientProfile.id;
+        const clientId = req.clientId;
         const { page, limit, offset } = getPagination(
             req.query.page,
             req.query.limit
         );
+        const { status } = req.query;
         const data = await ServiceRequest.findAndCountAll({
             where: { clientId },
             include: [
                 {
                     model: ServiceExecution,
                     as: "execution",
+                    where: status ? { status } : undefined,
+                    required: false,
                     include: [
                         {
                             model: ProviderProfile,
@@ -50,8 +45,9 @@ exports.getHistory = async (req, res) => {
             limit,
             offset
         });
-        const response = getPagingData(data, page, limit);
-        return sendSuccess(res, 200, "Histórico do cliente", response);
+        const { rows } = data;
+        const meta = getPagingData(data, page, limit);
+        return sendSuccess(res, 200, "Histórico do cliente", rows, { meta });
     } catch (error) {
         return sendError(res, 500, "Erro ao buscar histórico", error.message);
     }

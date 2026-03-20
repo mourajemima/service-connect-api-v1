@@ -1,20 +1,12 @@
-const { ClientProfile, ServiceRequest, RequestRecipient, Service, sequelize } = require("../models");
-
+const { ServiceRequest, RequestRecipient, Service, sequelize } = require("../models");
 const { sendSuccess, sendError } = require("../utils/apiResponse");
 const { findProvidersByCategory } = require("../services/requestService");
 
 exports.createRequest = async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-        const { description, serviceId, categoryId, type, scheduledAt } = req.body;
-        const userId = req.user.id;
-        const clientProfile = await ClientProfile.findOne({
-            where: { userId }
-        });
-        if (!clientProfile) {
-            return sendError(res, 404, "Perfil de cliente não encontrado");
-        }
-        const clientId = clientProfile.id;
+        const { description, serviceId, categoryId, type } = req.body;
+        const clientId = req.clientId;
         if (!description || !type) {
             await transaction.rollback();
             return sendError(res, 400, "Descrição e tipo são obrigatórios");
@@ -29,11 +21,10 @@ exports.createRequest = async (req, res) => {
         }
         const request = await ServiceRequest.create({
             description,
-            clientId: clientId,
+            clientId,
             serviceId,
             categoryId,
-            type,
-            scheduledAt
+            type
         }, { transaction });
         let recipients = [];
         if (type === "DIRECT") {

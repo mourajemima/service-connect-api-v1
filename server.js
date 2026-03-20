@@ -9,7 +9,7 @@ async function startServer() {
   try {
     await sequelize.authenticate();
     console.log("Banco de dados conectado");
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log("Tabelas sincronizadas");
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);

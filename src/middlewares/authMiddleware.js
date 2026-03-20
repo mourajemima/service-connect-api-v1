@@ -1,21 +1,29 @@
 const jwt = require("jsonwebtoken");
+const { User } = require("../models");
+const { sendError } = require("../utils/apiResponse");
 
-function authMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-        return res.status(401).json({
-            message: "Token não fornecido"
-        });
+        return sendError(res, 401, "Token não fornecido");
     }
     const token = authHeader.split(" ")[1];
+    if (!token) {
+        return sendError(res, 401, "Token inválido");
+    }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
+        const user = await User.findByPk(decoded.id);
+        if (!user || user.isBanned) {
+            return sendError(res, 403, "Acesso não autorizado");
+        }
+        req.user = {
+            id: user.id,
+            role: user.role
+        };
         next();
     } catch (error) {
-        return res.status(401).json({
-            message: "Token inválido"
-        });
+        return sendError(res, 401, "Token inválido ou expirado");
     }
 }
 

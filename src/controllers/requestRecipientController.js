@@ -1,7 +1,6 @@
 const {
     RequestRecipient,
     ServiceRequest,
-    ProviderProfile,
     ServiceExecution,
     sequelize
 } = require("../models");
@@ -10,14 +9,7 @@ const { sendSuccess, sendError } = require("../utils/apiResponse");
 exports.acceptRequest = async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-        const userId = req.user.id;
-        const providerProfile = await ProviderProfile.findOne({
-            where: { userId }
-        });
-        if (!providerProfile) {
-            return sendError(res, 404, "Perfil de prestador não encontrado");
-        }
-        const providerId = providerProfile.id;
+        const providerId = req.providerId;
         const { requestId } = req.params;
         const request = await ServiceRequest.findByPk(requestId, {
             transaction,
@@ -69,14 +61,7 @@ exports.acceptRequest = async (req, res) => {
 exports.rejectRequest = async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-        const userId = req.user.id;
-        const providerProfile = await ProviderProfile.findOne({
-            where: { userId }
-        });
-        if (!providerProfile) {
-            return sendError(res, 404, "Perfil de prestador não encontrado");
-        }
-        const providerId = providerProfile.id;
+        const providerId = req.providerId;
         const { requestId } = req.params;
         const request = await ServiceRequest.findByPk(requestId, {
             transaction,

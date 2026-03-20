@@ -32,10 +32,11 @@ exports.register = async (req, res) => {
             });
         }
         const token = generateToken(user);
-        res.status(201).json({
-            success: true,
-            message: "Usuário criado com sucesso",
-            data: {
+        return sendSuccess(
+            res,
+            201,
+            "Usuário criado com sucesso",
+            {
                 user: {
                     id: user.id,
                     name: user.name,
@@ -43,8 +44,8 @@ exports.register = async (req, res) => {
                     role: user.role
                 }
             },
-            token: token
-        });
+            { token }
+        );
     } catch (error) {
         return sendError(res, 500, "Erro ao criar usuário");
     }
@@ -57,15 +58,19 @@ exports.login = async (req, res) => {
         if (!user) {
             return sendError(res, 404, "Usuário não encontrado");
         }
+        if (user.isBanned) {
+            return sendError(res, 403, "Acesso não autorizado");
+        }
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
             return sendError(res, 401, "Senha inválida");
         }
         const token = generateToken(user);
-        res.status(200).json({
-            success: true,
-            message: "Login realizado com sucesso",
-            data: {
+        return sendSuccess(
+            res,
+            200,
+            "Login realizado com sucesso",
+            {
                 user: {
                     id: user.id,
                     name: user.name,
@@ -73,8 +78,8 @@ exports.login = async (req, res) => {
                     role: user.role
                 }
             },
-            token: token
-        });
+            { token }
+        );
     } catch (error) {
         return sendError(res, 500, "Erro no login");
     }
