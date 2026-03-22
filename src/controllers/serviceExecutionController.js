@@ -102,9 +102,13 @@ exports.cancelExecution = async (req, res) => {
             await transaction.rollback();
             return sendError(res, 403, "Sem permissão");
         }
-        if (["FINISHED", "CANCELLED"].includes(execution.status)) {
+        if (execution.status !== "ACCEPTED") {
             await transaction.rollback();
-            return sendError(res, 400, "Execução não pode ser cancelada");
+            return sendError(
+                res,
+                400,
+                "A execução só pode ser cancelada enquanto estiver com o status ACEITA"
+            );
         }
         await execution.update({
             status: "CANCELLED"
